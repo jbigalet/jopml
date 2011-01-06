@@ -8,11 +8,14 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
 
-public class Main extends JFrame {
+public class Main extends JFrame implements KeyListener {
 
-    public Main() {}
+    public Main() {
+        addKeyListener(this);
+    }
 
     public static TreeMap<String, String[]> ParsedArgs = new TreeMap<String,String[]>();
 
@@ -26,12 +29,14 @@ public class Main extends JFrame {
     public static List<Gate> RegGates;
     public static List<Gate> RamGates;
     public static List<Gate> OutputGates;
+    public static List<Gate> KeyHandlerGates;
     public static int iState;
     public static int NumberOfStates;
     public static Timer simulationTimer;
     public static long startingTime;
     public static boolean isVisual;
     public static boolean isRamGraph = true;
+    public static boolean isBinary;
 
     public static TreeMap<String,JLabel> VisualOutputs;
 
@@ -50,6 +55,25 @@ public class Main extends JFrame {
         new Thread(runThread).start();
     }
 
+    public static boolean isKeyEvent = false;
+    public static List<KeyEvent> keyEventToProcess = new ArrayList<KeyEvent>();
+
+    public void keyTyped(KeyEvent e) {}
+
+    public void keyPressed(KeyEvent e) {
+        isKeyEvent = true;
+        keyEventToProcess.add(e);
+        //int keyCode = e.getKeyCode();
+        //System.out.println("keyPressed, keyCode = " + keyCode + " ; keyText = " + KeyEvent.getKeyText(keyCode));
+    }
+
+    public void keyReleased(KeyEvent e) {
+        isKeyEvent = true;
+        keyEventToProcess.add(e);
+        //System.out.println("keyReleased");
+    }
+
+
     public static Main frame;
 
     public static void internMain(String[] args, Main tmpFrame) throws IOException, InterruptedException {
@@ -64,6 +88,7 @@ public class Main extends JFrame {
         isBrief = ParsedArgs.containsKey("brief");
         toPrintRam = ParsedArgs.containsKey("printram");
         isVisual = ParsedArgs.containsKey("visual");
+        isBinary = ParsedArgs.containsKey("binary");
 
         List<String> UnparsedGateList = ReadFile(FileName);
         System.out.println("Netlist \"" + FileName + "\" loaded.");
@@ -77,6 +102,8 @@ public class Main extends JFrame {
         List<Gate> InputGates = GetAndRemoveTypedGates(new String[] {"Input", "Zero", "One"}, GateList, true);
         RamGates = GetAndRemoveTypedGates(new String[] {"Ram", "Ram_Graphic"}, GateList, false);
         OutputGates = GetAndRemoveTypedGates(new String[] {"Output"}, GateList, true);
+        KeyHandlerGates = GetAndRemoveTypedGates(new String[] {"KeyHandler"}, GateList, true);
+
         //boolean[] RegValues = new boolean[varMaxInReg + 1];
         RegValues = initRegValues(RegGates, varMaxInReg);
 
@@ -167,6 +194,8 @@ public class Main extends JFrame {
             constraints.gridy = column++;
             panel.add(new JLabel(" "), constraints);
 
+            
+
             frame.pack();
             frame.setSize(500, frame.getHeight());
             frame.setLocationRelativeTo(null);
@@ -255,6 +284,7 @@ public class Main extends JFrame {
                 }
             }*/
 
+            isKeyEvent = false;
             iState++;
         }
 
@@ -348,6 +378,7 @@ public class Main extends JFrame {
             System.out.println("-onlyshow out1 out2 ... : Only show defined outputs.");
             System.out.println("-clocklimit limitInMS : Limit the simulator to do one tick every limitInMs millisecond.");
             System.out.println("-visual : To got a visual interface, to see the outputs in live.");
+            System.out.println("-binary : Print the outputs in binary (concatenate binaries).");
             System.exit(0);
         }
         
@@ -405,6 +436,10 @@ public class Main extends JFrame {
         if( ParsedArgs.containsKey("printram") )
             if( ParsedArgs.get("printram").length != 0 )
                 System.out.println("The is no arguments needed after the printram option. It will be ignored");
+
+        if( ParsedArgs.containsKey("binary") )
+            if( ParsedArgs.get("binary").length != 0 )
+                System.out.println("The is no arguments needed after the binary option. It will be ignored");
 
 
         if( ParsedArgs.containsKey("f") )
@@ -681,7 +716,7 @@ public class Main extends JFrame {
             else if(ParsingArray[0].equals("input"))
                 NewGate = new Input(ParsingArray[1], ParsingArray );
             else if(ParsingArray[0].equals("output"))
-                NewGate = new Output(ParsingArray, isBrief);
+                NewGate = new Output(ParsingArray, isBrief, isBinary);
             else if(ParsingArray[0].equals("ssd"))
                 NewGate = new SSD(ParsingArray, isBrief);
             else if(ParsingArray[0].equals("ram"))
@@ -692,6 +727,10 @@ public class Main extends JFrame {
                 isRamGraph = true;
                 //isVisual = true;
                 NewGate = new Ram_Graphic(ParsingArray);
+            }
+            else if(ParsingArray[0].equals("keyhandler")){
+                isVisual = true;
+                NewGate = new KeyHandler(Integer.parseInt(ParsingArray[1]),Integer.parseInt(ParsingArray[2]),Integer.parseInt(ParsingArray[3]));
             }
             else if(ParsingArray[0].equals("zero"))
                 NewGate = new Zero(Integer.parseInt(ParsingArray[1]));
