@@ -8,5 +8,5 @@ make clean > /dev/null
 make > /dev/null
 echo "> Generating netlist."
 circuits/proc $* netlists/proc.nl
-echo "> Netlist: netlists/$S.nl"
+echo "> Netlist: netlists/proc.nl"
 cd $SORIG
