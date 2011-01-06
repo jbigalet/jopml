@@ -37,6 +37,19 @@ public class Main extends JFrame implements KeyListener {
     public static boolean isVisual;
     public static boolean isRamGraph = true;
     public static boolean isBinary;
+    public static int[] keyPressMapping = new int[10000];
+    public static int[] keyReleaseMapping = new int[10000];
+    public static List<Integer> keyHandlerOutputs = new ArrayList<Integer>();
+    public static boolean[] VarTable;
+
+    public class KeyCouple {
+        public boolean isPressed;
+        public KeyEvent event;
+        public KeyCouple(boolean isPressed, KeyEvent event){
+            this.isPressed = isPressed;
+            this.event = event;
+        }
+    }
 
     public static TreeMap<String,JLabel> VisualOutputs;
 
@@ -56,23 +69,22 @@ public class Main extends JFrame implements KeyListener {
     }
 
     public static boolean isKeyEvent = false;
-    public static List<KeyEvent> keyEventToProcess = new ArrayList<KeyEvent>();
+    public static List<KeyCouple> keyEventToProcess = new ArrayList<KeyCouple>();
 
-    public void keyTyped(KeyEvent e) {}
+    public void keyTyped(KeyEvent e) { }
 
     public void keyPressed(KeyEvent e) {
         isKeyEvent = true;
-        keyEventToProcess.add(e);
+        keyEventToProcess.add(new KeyCouple(true,e));
         //int keyCode = e.getKeyCode();
         //System.out.println("keyPressed, keyCode = " + keyCode + " ; keyText = " + KeyEvent.getKeyText(keyCode));
     }
 
     public void keyReleased(KeyEvent e) {
         isKeyEvent = true;
-        keyEventToProcess.add(e);
+        keyEventToProcess.add(new KeyCouple(false,e));
         //System.out.println("keyReleased");
     }
-
 
     public static Main frame;
 
@@ -97,6 +109,7 @@ public class Main extends JFrame implements KeyListener {
         System.out.println("\t-> " + GateList.size() + " gates found.\n");
 
         varMaxTotal = varMax(GateList);
+        System.out.println(varMaxTotal);
         RegGates = GetAndRemoveTypedGates(new String[] {"Reg"}, GateList, true);
         int varMaxInReg = varMax(RegGates);
         List<Gate> InputGates = GetAndRemoveTypedGates(new String[] {"Input", "Zero", "One"}, GateList, true);
@@ -194,12 +207,18 @@ public class Main extends JFrame implements KeyListener {
             constraints.gridy = column++;
             panel.add(new JLabel(" "), constraints);
 
-            
-
             frame.pack();
             frame.setSize(500, frame.getHeight());
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
+        }
+
+        for(Gate g : KeyHandlerGates){
+            int keyCode = ((KeyHandler)g).keyCode;
+            keyPressMapping[keyCode] = g.OutputArray[0];
+            keyReleaseMapping[keyCode] = g.OutputArray[1];
+            keyHandlerOutputs.add(g.OutputArray[0]);
+            keyHandlerOutputs.add(g.OutputArray[1]);
         }
 
         startingTime = System.currentTimeMillis();
@@ -236,7 +255,9 @@ public class Main extends JFrame implements KeyListener {
                     VisualOutputs.get("tick").setText("### State n°" + (iState+1) + " ###");
             }
 
-            boolean[] VarTable = InitValues(iState, RegValues, RegGates, varMaxTotal);
+            VarTable = InitValues(iState, RegValues, RegGates, varMaxTotal);
+
+            KeyEventValuesActualisation();
 
             /*
             List<Gate> tempGateList = new ArrayList<Gate>();
@@ -284,7 +305,6 @@ public class Main extends JFrame implements KeyListener {
                 }
             }*/
 
-            isKeyEvent = false;
             iState++;
         }
 
@@ -475,7 +495,7 @@ public class Main extends JFrame implements KeyListener {
             if( !S.equals("NetListFile") && !S.equals("brief") && !S.equals("f")
              && !S.equals("tick") && !S.equals("i") && !S.equals("ram")
              && !S.equals("printram") && !S.equals("onlyshow") && !S.equals("clocklimit")
-             && !S.equals("visual"))
+             && !S.equals("visual") && !S.equals("binary"))
                 System.out.println("Warning : Argument " + S + " is unknow. It will be ignore.");
         
     }
@@ -555,6 +575,24 @@ public class Main extends JFrame implements KeyListener {
             if(SArray[i].equals(toCheck))
                 return true;
         return false;
+    }
+
+    public static void KeyEventValuesActualisation(){
+        for(int i : keyHandlerOutputs)
+            VarTable[i] = false;
+        
+        if(isKeyEvent){
+            for(KeyCouple KC : keyEventToProcess){
+                int keyCode = (KC.event).getKeyCode();
+                if(KC.isPressed)
+                    VarTable[keyPressMapping[keyCode]] = true;
+                else
+                    VarTable[keyReleaseMapping[keyCode]] = true;
+            }
+        }
+
+        keyEventToProcess = new ArrayList<KeyCouple>();
+        isKeyEvent = false;
     }
 
     public static void RegValuesActualisation(List<Gate> RegGates, boolean[] RegValues, boolean[] VarTable){
