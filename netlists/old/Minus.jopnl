@@ -1,0 +1,5 @@
+input x
+output y
+xor x c y
+or x y xy
+reg xy c
