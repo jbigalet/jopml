@@ -11,7 +11,7 @@ import java.awt.*;
 import javax.swing.*;
 
 public class Main extends JFrame {
-//hop
+
     public Main() {}
 
     public static TreeMap<String, String[]> ParsedArgs = new TreeMap<String,String[]>();
@@ -53,7 +53,7 @@ public class Main extends JFrame {
     public static Main frame;
 
     public static void internMain(String[] args, Main tmpFrame) throws IOException, InterruptedException {
-        startingTime = System.currentTimeMillis();
+        //startingTime = System.currentTimeMillis();
         frame = tmpFrame;
         
         ArgParsing(args);
@@ -173,6 +173,8 @@ public class Main extends JFrame {
             frame.setVisible(true);
         }
 
+        startingTime = System.currentTimeMillis();
+        
         iState = 0;
         simulationTimer = new Timer();
         if(isClockLimit)
