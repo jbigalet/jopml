@@ -1,0 +1,14 @@
+output b0
+output b1
+output b2
+output b3
+reg r0 b0
+reg r1 b1
+reg r2 b2
+reg r3 b3
+not b0 r0
+xor b0 b1 r1
+and b0 b1 b01
+xor b01 b2 r2
+and b01 b2 b012
+xor b012 b3 r3
