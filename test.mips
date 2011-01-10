@@ -1,4 +1,4 @@
-li $a0, 11
+li $a0, 4
 li $v0, 1
 loop:
 beqz $a0, end

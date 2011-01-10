@@ -1,6 +1,8 @@
 all:
-	pdflatex mi_projet.tex
-	pdflatex mi_projet.tex
+	latex documentation.tex
+	latex documentation.tex
+	dvips documentation.dvi
+	pstopdf documentation.ps
 
 clean:
-	@(rm -f *.aux *.log *.toc *.pdf)
+	@(rm -f *.ps *.dvi *.aux *.log *.toc *.pdf)

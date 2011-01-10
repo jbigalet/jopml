@@ -67,6 +67,7 @@ def convert_all(s):
             r += cvt(t, args) + "\n"
     ln = 0
     labels = {}
+#    print(r)
     nr = ""
     for i in r.split("\n"):
         if len(i) > 0 and i[0] == "#" and i[-1] == "#":
@@ -74,9 +75,10 @@ def convert_all(s):
         elif i != "":
             nr += i.replace("#HERE#", str(ln + 2)) + "\n"
             ln += 1
-#    print(nr)
+ #   print(nr)
+ #   print(labels)
     for (k,v) in labels.items():
-        nr = nr.replace(k + "\n", str(v) + "\n")
+        nr = nr.replace(k, str(v))
     return nr
 
 print(convert_all(open(sys.argv[1], "r").read()))
