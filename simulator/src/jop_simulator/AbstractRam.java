@@ -18,12 +18,10 @@ public class AbstractRam extends Gate {
         return Dec;
     }
     
-    public boolean[] BZero = new boolean[WordSize];
-
     public boolean[] Simulate(boolean[] Inputs){
         int Address = BinToDec(Inputs,1,AddressSize);
         if(Address >= RamSize)
-            return BZero;
+            return new boolean[WordSize];
         boolean[] toReturn = RamArray[Address].clone();
 
         if( Inputs[0] ) // write_flag = true
