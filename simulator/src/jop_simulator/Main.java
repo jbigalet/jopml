@@ -102,7 +102,6 @@ public class Main extends JFrame implements KeyListener {
         System.out.println("\t-> " + GateList.size() + " gates found.\n");
 
         varMaxTotal = varMax(GateList);
-        System.out.println("VarMax = " + varMaxTotal);
 
         RegGates = GetAndRemoveTypedGates(new String[] {"Reg"}, GateList, true);
         int varMaxInReg = varMax(RegGates);
@@ -313,7 +312,11 @@ public class Main extends JFrame implements KeyListener {
         }
 
         else {
-            if( isBrief ) PrintAllOutputs( GetAndRemoveTypedGates( new String[] {"Output","SSD"}, GateList, false) ) ;
+            if( isBrief ){
+                System.out.println(isBrief);
+                PrintAllOutputs( GetAndRemoveTypedGates( new String[] {"SSD"}, GateList, false) ) ;
+                PrintAllOutputs( OutputGates );
+            }
 
             if( isBrief && toPrintRam )
                 for(Gate RamG : RamGates)
