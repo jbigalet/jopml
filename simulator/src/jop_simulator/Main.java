@@ -102,12 +102,13 @@ public class Main extends JFrame implements KeyListener {
         System.out.println("\t-> " + GateList.size() + " gates found.\n");
 
         varMaxTotal = varMax(GateList);
+        System.out.println("VarMax = " + varMaxTotal);
 
         RegGates = GetAndRemoveTypedGates(new String[] {"Reg"}, GateList, true);
         int varMaxInReg = varMax(RegGates);
         List<Gate> InputGates = GetAndRemoveTypedGates(new String[] {"Input", "Zero", "One"}, GateList, true);
-        RamGates = GetAndRemoveTypedGates(new String[] {"Ram", "Ram_Graphic"}, GateList, false);
-        RamGraphicGates = GetAndRemoveTypedGates(new String[] {"Ram_Graphic"}, GateList, false);
+        RamGates = GetAndRemoveTypedGates(new String[] {"Ram", "Ram_Graphic"}, GateList, true);
+        RamGraphicGates = GetAndRemoveTypedGates(new String[] {"Ram_Graphic"}, RamGates, false);
         OutputGates = GetAndRemoveTypedGates(new String[] {"Output"}, GateList, true);
         KeyHandlerGates = GetAndRemoveTypedGates(new String[] {"KeyHandler"}, GateList, true);
         MouseHandlerGates = GetAndRemoveTypedGates(new String[] {"MouseHandler"}, GateList, true);
