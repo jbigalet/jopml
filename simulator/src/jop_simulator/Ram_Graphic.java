@@ -3,8 +3,9 @@ package jop_simulator;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
+import java.awt.Point;
 
-public class Ram_Graphic extends AbstractRam implements KeyListener {
+public class Ram_Graphic extends AbstractRam implements KeyListener, MouseListener {
     public int VerticalGraphSize, HorizontalGraphSize, ppp, ColorBit;
     public JFrame GraphicFrame;
     public MatrixDisplay GraphicPanel;
@@ -60,6 +61,7 @@ public class Ram_Graphic extends AbstractRam implements KeyListener {
         GraphicFrame.setSize(16+ppp*HorizontalGraphSize, 40+ppp*VerticalGraphSize);
         GraphicFrame.setVisible(true);
         GraphicFrame.addKeyListener(this);
+        GraphicFrame.addMouseListener(this);
     }
 
     public int[][] getMatrixDisplay(){
@@ -76,6 +78,8 @@ public class Ram_Graphic extends AbstractRam implements KeyListener {
         return Matrix;
     }
 
+    public boolean firstSim = true;
+
     @Override
     public boolean[] Simulate(boolean[] Inputs){
         int Address = BinToDec(Inputs,1,AddressSize);
@@ -83,12 +87,26 @@ public class Ram_Graphic extends AbstractRam implements KeyListener {
             return BZero;
         boolean[] toReturn = RamArray[Address].clone();
 
-        if( Inputs[0] ) // write_flag = true
+        if(firstSim)
+            GraphicPanel.Matrix = getMatrixDisplay();
+
+        if( Inputs[0] ){ // write_flag = true
             for(int i=0 ; i<WordSize ; i++)
                 RamArray[Address][i] = Inputs[i+AddressSize+1];
+            
+            if(Address < HorizontalGraphSize*VerticalGraphSize ){
+                GraphicPanel.isPixToDraw = true;
+                GraphicPanel.pixToDrawX = Address % HorizontalGraphSize;
+                GraphicPanel.pixToDrawY = Address / HorizontalGraphSize;
+                GraphicPanel.Matrix[GraphicPanel.pixToDrawX][GraphicPanel.pixToDrawY] = BinToDec(RamArray[Address], 0, RamArray[Address].length-1);
+            }
+        }
 
-        GraphicPanel.Matrix = getMatrixDisplay();
+        //GraphicPanel.Matrix = getMatrixDisplay();
+        
         GraphicPanel.repaint();
+        firstSim = false;
+        //GraphicPanel.init = false;
 
         return toReturn;
     }
@@ -115,5 +133,31 @@ public class Ram_Graphic extends AbstractRam implements KeyListener {
         keyEventToProcess.clear();
         return tmp;
     }
+
+    public void mouseExited(MouseEvent e) { }
+
+    public void mouseEntered(MouseEvent e) { }
+
+    public void mouseReleased(MouseEvent e) { }
+
+    public List<Integer> mouseEvents = new ArrayList<Integer>();
+
+    public void mousePressed(MouseEvent e) {
+       //System.out.println("Mouse pressed");
+       Point p = e.getLocationOnScreen();
+       int x = (p.x-8)/ppp;
+       int y = (p.y-30)/ppp;
+       mouseEvents.add(x+y*HorizontalGraphSize);
+    }
+
+    public List<Integer> getMouseEvents(){
+        List<Integer> tmp = new ArrayList<Integer>();
+        for(Integer KC : mouseEvents)
+            tmp.add(KC);
+        mouseEvents.clear();
+        return tmp;
+    }
+
+    public void mouseClicked(MouseEvent e) { }
 
 }

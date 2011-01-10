@@ -28,9 +28,12 @@ public class ImageToRam {
                 int red = (clr & 0x00ff0000) >> 16;
                 int green = (clr & 0x0000ff00) >> 8;
                 int blue =  clr & 0x000000ff;
-                S.append(DecToBin(red));
+                /*S.append(DecToBin(red));
                 S.append(DecToBin(green));
-                S.append(DecToBin(blue));
+                S.append(DecToBin(blue));*/
+                S.append(DecToBin(i*image.getHeight()+j));
+                S.append(DecToBin(j*image.getWidth()+i));
+                S.append(DecToBin(0));
             }
 
         File f = new File("C:\\test.txt");
