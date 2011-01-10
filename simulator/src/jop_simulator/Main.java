@@ -30,6 +30,7 @@ public class Main extends JFrame implements KeyListener {
     public static List<Gate> RamGates;
     public static List<Gate> OutputGates;
     public static List<Gate> KeyHandlerGates;
+    public static List<Gate> MouseHandlerGates;
     public static List<Gate> RamGraphicGates;
     public static int iState;
     public static int NumberOfStates;
@@ -41,6 +42,8 @@ public class Main extends JFrame implements KeyListener {
     public static int[] keyPressMapping = new int[10000];
     public static int[] keyReleaseMapping = new int[10000];
     public static List<Integer> keyHandlerOutputs = new ArrayList<Integer>();
+    public static List<List<Integer>> mouseHandlerOutputs = new ArrayList<List<Integer>>();
+    public static List<Integer> mouseHandlerPressed = new ArrayList<Integer>();
     public static boolean[] VarTable;
 
     public static TreeMap<String,JLabel> VisualOutputs;
@@ -61,6 +64,7 @@ public class Main extends JFrame implements KeyListener {
     }
 
     public static List<KeyCouple> keyEventToProcess = new ArrayList<KeyCouple>();
+    public static List<Integer> mouseEventToProcess = new ArrayList<Integer>();
 
     public void keyTyped(KeyEvent e) { }
 
@@ -106,6 +110,7 @@ public class Main extends JFrame implements KeyListener {
         RamGraphicGates = GetAndRemoveTypedGates(new String[] {"Ram_Graphic"}, GateList, false);
         OutputGates = GetAndRemoveTypedGates(new String[] {"Output"}, GateList, true);
         KeyHandlerGates = GetAndRemoveTypedGates(new String[] {"KeyHandler"}, GateList, true);
+        MouseHandlerGates = GetAndRemoveTypedGates(new String[] {"MouseHandler"}, GateList, true);
 
         //boolean[] RegValues = new boolean[varMaxInReg + 1];
         RegValues = initRegValues(RegGates, varMaxInReg);
@@ -211,6 +216,13 @@ public class Main extends JFrame implements KeyListener {
             keyHandlerOutputs.add(g.OutputArray[1]);
         }
 
+        for(Gate g : MouseHandlerGates){
+            mouseHandlerPressed.add(g.OutputArray[0]);
+            List<Integer> tmp = new ArrayList<Integer>();
+            for(int i=1 ; i<g.OutputArray.length ; i++)
+                tmp.add( g.OutputArray[i] );
+            mouseHandlerOutputs.add(tmp);
+        }
         startingTime = System.currentTimeMillis();
         
         iState = 0;
@@ -248,6 +260,7 @@ public class Main extends JFrame implements KeyListener {
             VarTable = InitValues(iState, RegValues, RegGates, varMaxTotal);
 
             KeyEventValuesActualisation();
+            MouseEventValuesActualisation();
 
             /*
             List<Gate> tempGateList = new ArrayList<Gate>();
@@ -585,6 +598,37 @@ public class Main extends JFrame implements KeyListener {
         keyEventToProcess.clear();
     }
 
+    public static void MouseEventValuesActualisation(){
+        for(int i : mouseHandlerPressed)
+            VarTable[i] = false;
+
+        for(Gate g : RamGraphicGates)
+            mouseEventToProcess.addAll( ((Ram_Graphic)g).getMouseEvents() );
+
+        for(Integer KC : mouseEventToProcess){
+            for(int i : mouseHandlerPressed)
+                VarTable[i] = true;
+            List<Boolean> tmp = DecToBin(KC);
+            for(List<Integer> L : mouseHandlerOutputs){
+                for(int j=0 ; j<tmp.size() && j<L.size() ; j++)
+                    VarTable[L.get(j)] = tmp.get(j);
+                for(int j=tmp.size() ; j<L.size() ; j++)
+                    VarTable[L.get(j)] = false;
+            }
+        }
+
+        mouseEventToProcess.clear();
+    }
+
+    public static List<Boolean> DecToBin(int x){
+        List<Boolean> lB = new ArrayList<Boolean>();
+        for(int i=0 ; i<8 ; i++){
+            lB.add(x % 2 == 1);
+            x /= 2;
+        }
+        return lB;
+    }
+
     public static void RegValuesActualisation(List<Gate> RegGates, boolean[] RegValues, boolean[] VarTable){
         for(Gate g : RegGates)
             RegValues[g.OutputArray[0]] = VarTable[g.InputArray[0]];
@@ -759,6 +803,10 @@ public class Main extends JFrame implements KeyListener {
             else if(ParsingArray[0].equals("keyhandler")){
                 isVisual = true;
                 NewGate = new KeyHandler(Integer.parseInt(ParsingArray[1]),Integer.parseInt(ParsingArray[2]),Integer.parseInt(ParsingArray[3]));
+            }
+            else if(ParsingArray[0].equals("mousehandler")){
+                isVisual = true;
+                NewGate = new MouseHandler(ParsingArray);
             }
             else if(ParsingArray[0].equals("zero"))
                 NewGate = new Zero(Integer.parseInt(ParsingArray[1]));
