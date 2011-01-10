@@ -1,6 +1,0 @@
-input x
-output s
-output r
-xor x s xs
-reg xs s
-and x s r

@@ -1,5 +1,0 @@
-output o
-output c
-reg c o
-reg o ro
-not ro c
