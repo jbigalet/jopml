@@ -313,7 +313,6 @@ public class Main extends JFrame implements KeyListener {
 
         else {
             if( isBrief ){
-                System.out.println(isBrief);
                 PrintAllOutputs( GetAndRemoveTypedGates( new String[] {"SSD"}, GateList, false) ) ;
                 PrintAllOutputs( OutputGates );
             }
