@@ -30,6 +30,7 @@ public class Main extends JFrame implements KeyListener {
     public static List<Gate> RamGates;
     public static List<Gate> OutputGates;
     public static List<Gate> KeyHandlerGates;
+    public static List<Gate> RamGraphicGates;
     public static int iState;
     public static int NumberOfStates;
     public static Timer simulationTimer;
@@ -41,15 +42,6 @@ public class Main extends JFrame implements KeyListener {
     public static int[] keyReleaseMapping = new int[10000];
     public static List<Integer> keyHandlerOutputs = new ArrayList<Integer>();
     public static boolean[] VarTable;
-
-    public class KeyCouple {
-        public boolean isPressed;
-        public KeyEvent event;
-        public KeyCouple(boolean isPressed, KeyEvent event){
-            this.isPressed = isPressed;
-            this.event = event;
-        }
-    }
 
     public static TreeMap<String,JLabel> VisualOutputs;
 
@@ -68,20 +60,17 @@ public class Main extends JFrame implements KeyListener {
         new Thread(runThread).start();
     }
 
-    public static boolean isKeyEvent = false;
     public static List<KeyCouple> keyEventToProcess = new ArrayList<KeyCouple>();
 
     public void keyTyped(KeyEvent e) { }
 
     public void keyPressed(KeyEvent e) {
-        isKeyEvent = true;
         keyEventToProcess.add(new KeyCouple(true,e));
         //int keyCode = e.getKeyCode();
         //System.out.println("keyPressed, keyCode = " + keyCode + " ; keyText = " + KeyEvent.getKeyText(keyCode));
     }
 
     public void keyReleased(KeyEvent e) {
-        isKeyEvent = true;
         keyEventToProcess.add(new KeyCouple(false,e));
         //System.out.println("keyReleased");
     }
@@ -109,11 +98,12 @@ public class Main extends JFrame implements KeyListener {
         System.out.println("\t-> " + GateList.size() + " gates found.\n");
 
         varMaxTotal = varMax(GateList);
-        System.out.println(varMaxTotal);
+
         RegGates = GetAndRemoveTypedGates(new String[] {"Reg"}, GateList, true);
         int varMaxInReg = varMax(RegGates);
         List<Gate> InputGates = GetAndRemoveTypedGates(new String[] {"Input", "Zero", "One"}, GateList, true);
         RamGates = GetAndRemoveTypedGates(new String[] {"Ram", "Ram_Graphic"}, GateList, false);
+        RamGraphicGates = GetAndRemoveTypedGates(new String[] {"Ram_Graphic"}, GateList, false);
         OutputGates = GetAndRemoveTypedGates(new String[] {"Output"}, GateList, true);
         KeyHandlerGates = GetAndRemoveTypedGates(new String[] {"KeyHandler"}, GateList, true);
 
@@ -580,19 +570,19 @@ public class Main extends JFrame implements KeyListener {
     public static void KeyEventValuesActualisation(){
         for(int i : keyHandlerOutputs)
             VarTable[i] = false;
+
+        for(Gate g : RamGraphicGates)
+            keyEventToProcess.addAll( ((Ram_Graphic)g).getKeyEvents() );
         
-        if(isKeyEvent){
-            for(KeyCouple KC : keyEventToProcess){
-                int keyCode = (KC.event).getKeyCode();
-                if(KC.isPressed)
-                    VarTable[keyPressMapping[keyCode]] = true;
-                else
-                    VarTable[keyReleaseMapping[keyCode]] = true;
-            }
+        for(KeyCouple KC : keyEventToProcess){
+            int keyCode = (KC.event).getKeyCode();
+            if(KC.isPressed)
+                VarTable[keyPressMapping[keyCode]] = true;
+            else
+                VarTable[keyReleaseMapping[keyCode]] = true;
         }
 
-        keyEventToProcess = new ArrayList<KeyCouple>();
-        isKeyEvent = false;
+        keyEventToProcess.clear();
     }
 
     public static void RegValuesActualisation(List<Gate> RegGates, boolean[] RegValues, boolean[] VarTable){

@@ -1,8 +1,10 @@
 package jop_simulator;
 
+import java.awt.event.*;
+import java.util.*;
 import javax.swing.*;
 
-public class Ram_Graphic extends AbstractRam {
+public class Ram_Graphic extends AbstractRam implements KeyListener {
     public int VerticalGraphSize, HorizontalGraphSize, ppp, ColorBit;
     public JFrame GraphicFrame;
     public MatrixDisplay GraphicPanel;
@@ -10,8 +12,9 @@ public class Ram_Graphic extends AbstractRam {
     // No debugging for now if the ram is not entered is the right format.
     //
     // The good format is :
-    //     ram @Alias WordSize AddressSize RamSize Horizontal_Graph_Size
-    //         Vertical_Graph_Size write_flag [addr]#AS [write_data]#WS [read_data]#WS
+    //     ramgraph @Alias WordSize AddressSize RamSize Horizontal_Graph_Size
+    //         Vertical_Graph_Size PixelPerPoint ColorBit write_flag [addr]#AS
+    //         [write_data]#WS [read_data]#WS
     // (Ram size = 2^AdressSize words)
     // The first part of the ram is a Matrix Display of the defined size
 
@@ -56,6 +59,7 @@ public class Ram_Graphic extends AbstractRam {
         GraphicFrame.add(GraphicPanel);
         GraphicFrame.setSize(16+ppp*HorizontalGraphSize, 40+ppp*VerticalGraphSize);
         GraphicFrame.setVisible(true);
+        GraphicFrame.addKeyListener(this);
     }
 
     public int[][] getMatrixDisplay(){
@@ -88,4 +92,28 @@ public class Ram_Graphic extends AbstractRam {
 
         return toReturn;
     }
+
+    public void keyTyped(KeyEvent e) { }
+
+    List<KeyCouple> keyEventToProcess = new ArrayList<KeyCouple>();
+
+    public void keyPressed(KeyEvent e) {
+        keyEventToProcess.add(new KeyCouple(true,e));
+        //int keyCode = e.getKeyCode();
+        //System.out.println("keyPressed, keyCode = " + keyCode + " ; keyText = " + KeyEvent.getKeyText(keyCode));
+    }
+
+    public void keyReleased(KeyEvent e) {
+        keyEventToProcess.add(new KeyCouple(false,e));
+        //System.out.println("keyReleased");
+    }
+
+    public List<KeyCouple> getKeyEvents(){
+        List<KeyCouple> tmp = new ArrayList<KeyCouple>();
+        for(KeyCouple KC : keyEventToProcess)
+            tmp.add(KC);
+        keyEventToProcess.clear();
+        return tmp;
+    }
+
 }

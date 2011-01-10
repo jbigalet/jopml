@@ -14,7 +14,7 @@ public class SSD extends Gate {
         // Use ssd HorizontalSize VerticalSiz0 bit0 bit1 ... bit6
     public SSD(String[] ParsedArray, boolean isBrief){
         super("SSD", new int[7], new int[] {});
-        
+            
         this.Alias = ParsedArray[1].substring( 1 );
         this.HorSize = Integer.parseInt(ParsedArray[2]);
         this.VerSize = Integer.parseInt(ParsedArray[3]);
