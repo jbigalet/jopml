@@ -51,7 +51,7 @@ def cvt(op, a):
         return cvt("li", ["$ra", "#HERE#"]) + "\n" + cvt("j", [a[0]])
     if op == "beqz":
         return "%s or %s $0 %s" % (reg(a[0]), reg('$pc'), "#%s#" % a[1])
-
+    return ""
         
 
 def convert_all(s):
