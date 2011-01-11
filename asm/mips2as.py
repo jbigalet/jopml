@@ -52,7 +52,25 @@ def cvt(op, a):
         return cvt("li", ["$ra", "#HERE#"]) + "\n" + cvt("j", [a[0]])
     if op == "beqz":
         return "%s or %s $0 %s" % (reg(a[0]), reg('$pc'), "#%s#" % a[1])
-    return ""
+    if op == "bnez":
+        return "%s add %s %s 2\n$0 or %s $0 %s" % (reg(a[0]), reg('$pc'),
+reg('$pc'), reg('$pc'), "#%s#" % a[1])
+    if op == "ble":
+        return ("$0 sub %s %s %s\n" % (reg('$at'), reg(a[1]), reg(a[0])))
+	+ ("$0 isp %s %s %s" % (reg('$at'), reg('$at'), reg('$at')))
+	+ cvt("beqz", ['$at', a[2]])
+    if op == "bge":
+	return cvt("ble", [a[1], a[0], a[2]])
+    if op == "blt":
+        return ("$0 sub %s %s %s\n" % (reg('$at'), reg(a[1]),
+reg(a[0])))
+        + ("%s isp %s %s %s" % (reg('at'), reg('$at'), reg('$at'), reg('$at')))
+        + cvt("beqz", ['$at', a[2]])
+    if op == "bgt":
+        return cvt("lt", [a[1], a[0], a[2]])
+    if op == "" or op[0] == "#":
+        return ""
+    raise ValueError("Unknown instr : %s" % op)
         
 
 def convert_all(s):

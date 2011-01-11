@@ -1,4 +1,250 @@
-li $15, 42
-addi $15, $15, 1
-addi $15, $15, 1
-addi $15, $15, 1
+	li   $sp, 900
+	j    main
+main:
+	#IR: _ move $fp, $sp
+	move $fp, $sp
+	#IR: $t4 <- $ra
+	move $t4, $ra
+	#IR: $v0 <- 0
+	li   $v0, 0
+	#IR: stack[0] <- 42
+	li   $a0, 42
+	sw   $a0, 0($fp)
+	#IR: $v0 -> $t0
+	move $t0, $v0
+	#IR: stack[1] <- $t0
+	sw   $t0, -4($fp)
+	#IR: stack[0] -> $t0
+	lw   $t0, 0($fp)
+	#IR: stack[1] -> $t1
+	lw   $t1, -4($fp)
+	#IR: (*$t1) <- $t0
+	sw   $t0, 0($t1)
+	#IR: stack[0] <- 43
+	li   $a0, 43
+	sw   $a0, 0($fp)
+	#IR: $v0 -> $t0
+	move $t0, $v0
+	#IR: stack[1] <- $t0
+	sw   $t0, -4($fp)
+	#IR: stack[0] -> $t0
+	lw   $t0, 0($fp)
+	#IR: stack[1] -> $t1
+	lw   $t1, -4($fp)
+	#IR: (*$t1 + 1) <- $t0
+	sw   $t0, 4($t1)
+	#IR: stack[0] <- 20
+	li   $a0, 20
+	sw   $a0, 0($fp)
+	#IR: stack[0] -> $t0
+	lw   $t0, 0($fp)
+	#IR: stack[1] <- $t0
+	sw   $t0, -4($fp)
+	#IR: stack[0] <- 2
+	li   $a0, 2
+	sw   $a0, 0($fp)
+	#IR: stack[2] <- 34
+	li   $a0, 34
+	sw   $a0, -8($fp)
+	#IR: $v0 -> $a0
+	move $a0, $v0
+	#IR: stack[2] -> $t0
+	lw   $t0, -8($fp)
+	#IR: (*$a0) <- $t0
+	sw   $t0, 0($a0)
+	#IR: stack[2] <- 32
+	li   $a0, 32
+	sw   $a0, -8($fp)
+	#IR: $v0 -> $a0
+	move $a0, $v0
+	#IR: stack[2] -> $t0
+	lw   $t0, -8($fp)
+	#IR: (*$a0) <- $t0
+	sw   $t0, 0($a0)
+	#IR: _ j    while_cond2
+	j    while_cond2
+	#IR: _ while_begin1:
+while_begin1:
+	#IR: stack[2] <- 38
+	li   $a0, 38
+	sw   $a0, -8($fp)
+	#IR: $v0 -> $a0
+	move $a0, $v0
+	#IR: stack[2] -> $t0
+	lw   $t0, -8($fp)
+	#IR: (*$a0) <- $t0
+	sw   $t0, 0($a0)
+	#IR: $v0 -> $t0
+	move $t0, $v0
+	#IR: stack[2] <- $t0
+	sw   $t0, -8($fp)
+	#IR: $a0 <- 4
+	li   $a0, 4
+	#IR: stack[0] -> $t0
+	lw   $t0, 0($fp)
+	#IR: stack[2] <- $t0
+	sw   $t0, -8($fp)
+	#IR: stack[2] -> $t1
+	lw   $t1, -8($fp)
+	#IR: $a0 <- * $a0 $t1
+	mul  $a0, $a0, $t1
+	#IR: stack[2] -> $t0
+	lw   $t0, -8($fp)
+	#IR: $t0 <- + $t0 $a0
+	add  $t0, $t0, $a0
+	#IR: stack[2] <- $t0
+	sw   $t0, -8($fp)
+	#IR: stack[2] -> $t1
+	lw   $t1, -8($fp)
+	#IR: (*$t1) -> $a0
+	move $a0, $t1
+	lw   $a0, 0($a0)
+	#IR: _ beqz $a0, if3
+	beqz $a0, if3
+	#IR: stack[2] <- 40
+	li   $a0, 40
+	sw   $a0, -8($fp)
+	#IR: $v0 -> $t0
+	move $t0, $v0
+	#IR: stack[3] <- $t0
+	sw   $t0, -12($fp)
+	#IR: stack[2] -> $t0
+	lw   $t0, -8($fp)
+	#IR: stack[3] -> $t1
+	lw   $t1, -12($fp)
+	#IR: (*$t1) <- $t0
+	sw   $t0, 0($t1)
+	#IR: _ j    endif4
+	j    endif4
+	#IR: _ if3:
+if3:
+	#IR: stack[0] -> $t0
+	lw   $t0, 0($fp)
+	#IR: stack[2] <- $t0
+	sw   $t0, -8($fp)
+	#IR: stack[2] -> $t0
+	lw   $t0, -8($fp)
+	#IR: stack[3] <- $t0
+	sw   $t0, -12($fp)
+	#IR: _ j    while_cond6
+	j    while_cond6
+	#IR: _ while_begin5:
+while_begin5:
+	#IR: stack[2] <- 1
+	li   $a0, 1
+	sw   $a0, -8($fp)
+	#IR: $v0 -> $t4
+	move $t4, $v0
+	#IR: $t4 <- 4
+	li   $t4, 4
+	#IR: stack[3] -> $t4
+	lw   $t4, -12($fp)
+	#IR: $t4 <- * $t4 $t4
+	mul  $t4, $t4, $t4
+	#IR: $ra <- + $t4 $t4
+	add  $ra, $t4, $t4
+	#IR: stack[2] -> $t0
+	lw   $t0, -8($fp)
+	#IR: (*$ra) <- $t0
+	sw   $t0, 0($ra)
+	#IR: stack[3] -> $t0
+	lw   $t0, -12($fp)
+	#IR: stack[2] <- $t0
+	sw   $t0, -8($fp)
+	#IR: stack[0] -> $ra
+	lw   $ra, 0($fp)
+	#IR: stack[2] -> $t0
+	lw   $t0, -8($fp)
+	#IR: $t0 <- + $t0 $ra
+	add  $t0, $t0, $ra
+	#IR: stack[2] <- $t0
+	sw   $t0, -8($fp)
+	#IR: stack[2] -> $t0
+	lw   $t0, -8($fp)
+	#IR: stack[3] <- $t0
+	sw   $t0, -12($fp)
+	#IR: _ while_cond6:
+while_cond6:
+	#IR: stack[1] -> $ra
+	lw   $ra, -4($fp)
+	#IR: stack[3] -> $t0
+	lw   $t0, -12($fp)
+	#IR: $a0 <- < $t0 $ra
+	li   $a2, 1
+	blt $t0, $ra, test7
+	move $a2, $zero
+test7:
+	move $a0, $a2
+	#IR: _ bnez $a0, while_begin5
+	bnez $a0, while_begin5
+	#IR: _ endif4:
+endif4:
+	#IR: stack[0] -> $t0
+	lw   $t0, 0($fp)
+	#IR: stack[2] <- $t0
+	sw   $t0, -8($fp)
+	#IR: stack[3] <- 1
+	li   $a0, 1
+	sw   $a0, -12($fp)
+	#IR: stack[2] -> $t0
+	lw   $t0, -8($fp)
+	#IR: stack[3] -> $t1
+	lw   $t1, -12($fp)
+	#IR: $ra <- + $t0 $t1
+	add  $ra, $t0, $t1
+	#IR: stack[0] <- $ra
+	sw   $ra, 0($fp)
+	#IR: _ while_cond2:
+while_cond2:
+	#IR: stack[0] -> $t1
+	lw   $t1, 0($fp)
+	#IR: stack[1] -> $t0
+	lw   $t0, -4($fp)
+	#IR: $a0 <- < $t0 $t1
+	li   $a2, 1
+	blt $t0, $t1, test8
+	move $a2, $zero
+test8:
+	move $a0, $a2
+	#IR: _ bnez $a0, while_begin1
+	bnez $a0, while_begin1
+	#IR: stack[2] <- 30
+	li   $a0, 30
+	sw   $a0, -8($fp)
+	#IR: stack[2] -> $t0
+	lw   $t0, -8($fp)
+	#IR: (*$v0) <- $t0
+	sw   $t0, 0($v0)
+	#IR: stack[3] <- 0
+	li   $a0, 0
+	sw   $a0, -12($fp)
+	#IR: stack[3] -> $t0
+	lw   $t0, -12($fp)
+	#IR: $v0 <- $t0
+	move $v0, $t0
+	#IR: stack[3] -> $t0
+	lw   $t0, -12($fp)
+	#IR: return $t0
+	jr   $ra
+	#IR: _ exit:
+exit:
+	#IR: $t4 -> $ra
+	move $ra, $t4
+	#IR: _ jr   $ra
+	jr   $ra
+_user_main:
+	#IR: stack[0] <- 0
+	li   $a0, 0
+	sw   $a0, 0($fp)
+	#IR: stack[0] <- 0
+	li   $a0, 0
+	sw   $a0, 0($fp)
+	#IR: stack[0] -> $t0
+	lw   $t0, 0($fp)
+	#IR: $v0 <- $t0
+	move $v0, $t0
+	#IR: stack[0] -> $t0
+	lw   $t0, 0($fp)
+	#IR: return $t0
+	jr   $ra
+

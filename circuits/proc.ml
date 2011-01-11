@@ -42,6 +42,9 @@ let bitwise op a b =
 let rec dup p = function
   | 0 -> (empty, [])
   | n -> (<;> | (p) | (dup p (n-1)))
+let rec last = function | [x] -> x | x::xs -> last xs | [] -> failwith "vide"
+let is_pos p =
+  not_ (last (ls p))
 
 let no_overflow c =
   <;> | (c) | (zero ())
