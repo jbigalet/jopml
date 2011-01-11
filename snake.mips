@@ -1,0 +1,125 @@
+	# t7 -> Noir, s7 -> bleu
+li $t7, 7
+li $s7, 2
+	#initialisation : coloration des bords (donc de l'interieur en blanc)
+li $a1, 1
+li $a2, 1
+init:
+	muli $a3, $a2, 16
+	add $a3, $a3, $a1  
+	sw $t7, 0($a3)
+	addi $a1, $a1, 1
+	subi $t5, $a1, 15
+	beqz $t5, init2
+	j init
+	init2:
+		li $a1, 1
+		addi $a2, $a2, 1
+		subi $t5, $a2, 15
+		beqz $t5, main
+		j init
+	#a1, (a2) : position currente
+	#t0, t1, t2, t3 : keyHandlers sur pressed de kc=38 (Haut), 40 (Bas),  37 (Gauche), 39 (Droite)
+	#v0 : random(0..255)
+	#t7 : 7 = (111) -> Couleur blanche, zero = (000) -> Couleur noire
+	#s1 : direction courante (Haut:-16, Bas:+16, Gauche:-1, Droite:+1) / $s2 : signe de direction (0 : +, 1 : -)
+	#k0 : longueur de la queue -1 (k0=0 -> queue = 1)
+	#t4 : Score
+li $t4, 0
+main:
+	li $k0, 3
+	li $a1, 132
+	sw $a1, 1036($zero)
+	li $a1, 131
+	sw $a1, 1032($zero)
+	li $a1, 130
+	sw $a1, 1028($zero)
+	li $a1, 129
+	sw $a1, 1024($zero)
+	li $s1, 1
+	li $s2, 0
+	j genecherry
+mainb:
+	lw $t8, 0($a1)
+	beqz $t8, gameover
+	subi $t5, $t8, 2
+	beqz $t5, gotcherry
+mainc:
+	sw $zero, 0($a1)
+gestionqueue:
+		# On efface le premier block (l'ancien)
+	lw $t9, 1024($k0)
+	sw $t7, 0($t9)
+		# On switch toute la queue
+	move $k1, $k0
+switchqueue:
+		# Quand k1=0, on s'arrete
+	beqz $k1, finswitch
+		# On load le reg d'après et on le store dans celui courant
+	lw $s6, 1020($k1)
+	sw $s6, 1024($k1)
+		# Et on incremente $k1
+	subi $k1, $k1, 1
+	j switchqueue
+finswitch:
+		# On stocke le nouveau block à la fin de la queue
+	sw $a1, 1024($zero)
+	
+	subi $t5, $t0, 1
+	beqz $t5, haut
+	subi $t5, $t1, 1
+	beqz $t5, bas
+	subi $t5, $t2, 1
+	beqz $t5, gauche
+	subi $t5, $t3, 1
+	beqz $t5, droite
+makemove:
+	beqz $s2, adds
+	sub $a1, $a1, $s1
+	j mainb
+	adds:
+		add $a1, $a1, $s1
+		j mainb
+haut:
+	subi $t6, $s1, 16
+	beqz $t6, makemove
+	li $s1, 16
+	li $s2, 1
+	j makemove
+bas:
+	subi $t6, $s1, 16
+	beqz $t6, makemove
+	li $s1, 16
+	li $s2, 0
+	j makemove
+gauche:
+	subi $t6, $s1, 1
+	beqz $t6, makemove
+	li $s1, 1
+	li $s2, 1
+	j makemove
+droite:
+	subi $t6, $s1, 1
+	beqz $t6, makemove
+	li $s1, 1
+	li $s2, 0
+	j makemove
+gotcherry:
+	addi $t4, $t4, 1
+	addi $k0, $k0, 1
+	li $t9, 10000
+	sw $t9, 1024($k0)
+genecherry:
+		# Generate a number
+	move $v1, $v0
+		# Check if it's not in the snake or in a wall
+	lw $t5, 0($v1)
+	beqz $t5, genecherry
+	sw $s7, 0($v1)
+	j mainc
+gameover:
+	li $t7, 1
+	sw $t7, 0($a1)
+gameoverloop:
+	sw $t7, 0($v0)
+	j gameoverloop
