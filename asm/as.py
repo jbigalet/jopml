@@ -5,7 +5,7 @@ binops = {
     'and': 1,
     'xor': 2,
     'not': 3,
-    'add': 2,
+    'add': 4,
     'neg': 5,
     'sub': 6,
     'mul': 7
@@ -21,6 +21,8 @@ def parse_imm(s):
         return (1, int(s))
 def pad_word(x):
     return x + ([0]*(word_size - len(x)))
+def neg(x):
+    return map(lambda i: 1-i, x)
 def bin(x):
     if x == 0: return []
     elif x % 2 == 0: return [0] + bin(x/2)
@@ -34,6 +36,9 @@ def convert_instr(i):
         a1 = parse_reg(i[2])
         a2 = parse_reg(i[3])
         imm,a3 = parse_imm(i[4])
+        if a3 < 0 and i[1] == "add" and imm == 1:
+            return instr(a0, [imm, 0, 0] + bin(binops["sub"]), a1, a2, -a3)
+        elif a3 < 0: raise ValueError("plop")
         return instr(a0, [imm, 0, 0] + bin(binops[i[1]]), a1, a2, a3)
     elif i[1] == "lw":
         a1 = parse_reg(i[2])

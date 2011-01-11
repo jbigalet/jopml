@@ -299,6 +299,7 @@ let proc_core rom v =
   | (output "a3_id" r3_id)
   | (output "write_mask" reg_overwrite)
   | (output "instr" instr)
+  | (output "v" v)
   | (output "immediate" is_imm)
 (* instr: imm[1] type[2] alu_type[:] *)
 (* type : 00 alu 10 load 01 store *)
@@ -333,10 +334,11 @@ let proc () =
   v_ram[word_size],
   v[word_size]
   >
-  | dummy,i_type1,i_type2,alu_type,a2,a3 = proc_core (rom "program_rom" 100) v
+  | dummy,i_type1,i_type2,alu_type,a2,a3 = proc_core (rom "program_rom" 1000) v
   | v_alu,ovf = alu a2 a3 alu_type alu_codes
-  | v_ram = ram { ram_size = 100; addr_size = word_size; data_size = word_size; ram_name = "main_ram" } a3 i_type2 a2
+  | v_ram = ram { ram_size = 1000; addr_size = word_size; data_size = word_size; ram_name = "main_ram" } a3 i_type2 a2
   | v = select2 v_alu v_ram i_type1
+  | (output "is_ram" i_type1)
 
 let main () =
   proc ()

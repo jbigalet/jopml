@@ -36,7 +36,8 @@ def cvt(op, a):
     if op in ["lw", "sw"]:
         r,ofs = addr(a[1])
         if ofs != 0:
-            return cvt("add", ['$at', r, ofs]) + ("\n$0 %s %s %s" % (op, reg(a[0]), reg('$at')))
+            if ofs % 4 != 0: raise ValueError("Offset %d is not multiple of 4" % ofs)
+            return cvt("addi", ['$at', r, ofs/4]) + ("\n$0 %s %s %s" % (op, reg(a[0]), reg('$at')))
         else:
             return "$0 %s %s %s" % (op, reg(a[0]), r)
     if op == "li":
