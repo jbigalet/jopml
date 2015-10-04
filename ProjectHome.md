@@ -1,0 +1,1 @@
+As part of a student project, we are trying to make a logic synchronous circuit simulator, with the ultimate goal of simulating a processor and a digital clock running on it.
